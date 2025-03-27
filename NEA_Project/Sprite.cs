@@ -29,8 +29,34 @@ namespace NEA_Project
         public void Update(GraphicsDeviceManager graphics,float time)
         {
             Position += Direction * Volocity * time;
-            if (Position.X < Origin.X || Position.X > graphics.PreferredBackBufferWidth - Origin.X) Direction = new(-Direction.X, Direction.Y);
-            if (Position.Y < Origin.Y || Position.Y > graphics.PreferredBackBufferHeight - Origin.Y) Direction = new(Direction.X, -Direction.Y);
+            if (Position.X < Origin.X )
+            {
+                if (Direction.X < 0)
+                {
+                    Direction = new(-Direction.X, Direction.Y);
+                }
+            }
+            else if(Position.X > graphics.PreferredBackBufferWidth - Origin.X)
+            {
+                if (Direction.X > 0)
+                {
+                    Direction = new(-Direction.X, Direction.Y);
+                }
+            }
+            if (Position.Y < Origin.Y)
+            {
+                if (Direction.Y < 0)
+                {
+                    Direction = new(Direction.X, -Direction.Y);
+                }
+            }
+            else if (Position.Y > graphics.PreferredBackBufferHeight - Origin.Y)
+            {
+                if (Direction.Y > 0)
+                {
+                    Direction = new(Direction.X, -Direction.Y);
+                }
+            }
         }
     }
 }

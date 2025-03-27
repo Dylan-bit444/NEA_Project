@@ -12,15 +12,16 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Sprite[] sprites =new Sprite[60];
+        private Sprite[] sprites =new Sprite[200];
 
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false ;
             _graphics.PreferredBackBufferWidth = 1950;
             _graphics.PreferredBackBufferHeight = 1100;
+            _graphics.IsFullScreen = true;
         }
 
         protected override void Initialize()
@@ -37,7 +38,7 @@ namespace NEA_Project
             Texture2D ball = Content.Load<Texture2D>("Ball");
             for(int i=0; i<sprites.Length;i++)
             {
-                sprites[i] = new(ball, new Vector2(rnd.Next(ball.Width+5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height+5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 900, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
+                sprites[i] = new(ball, new Vector2(rnd.Next(ball.Width+5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height+5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 500, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
             }
             // TODO: use this.Content to load your game content here
         }
