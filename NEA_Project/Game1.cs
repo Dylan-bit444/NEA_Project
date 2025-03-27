@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace NEA_Project
 {
@@ -8,6 +9,7 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private Sprite[] sprites =new Sprite[10];
 
         public Game1()
         {
@@ -25,8 +27,12 @@ namespace NEA_Project
 
         protected override void LoadContent()
         {
+            Random rnd = new Random();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            Texture2D ball = Content.Load<Texture2D>("Ball");
+            foreach(Sprite s in sprites)
+            {
+            }
             // TODO: use this.Content to load your game content here
         }
 
@@ -47,6 +53,13 @@ namespace NEA_Project
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+        }
+
+        private void ResolveCollision(Sprite b1, Sprite b2)
+        {
+            var dir = Vector2.Normalize(b1.Position - b2.Position);
+            b1.Direction = dir;
+            b2.Direction = -dir;
         }
     }
 }
