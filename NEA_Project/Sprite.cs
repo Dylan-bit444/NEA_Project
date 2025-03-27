@@ -32,14 +32,5 @@ namespace NEA_Project
             if (Position.X < Origin.X || Position.X > graphics.PreferredBackBufferWidth - Origin.X) Direction = new(-Direction.X, Direction.Y);
             if (Position.Y < Origin.Y || Position.Y > graphics.PreferredBackBufferHeight - Origin.Y) Direction = new(Direction.X, -Direction.Y);
         }
-
-        public bool CheckCollition(Sprite sprite)
-        {
-            if((this.Position - sprite.Position).Length() > this.Origin.X + sprite.Origin.X)
-            {
-                return true;
-            }
-            return false;
-        }
     }
 }
