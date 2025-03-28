@@ -15,9 +15,10 @@ namespace NEA_Project
             this.Volocity = Volocity;
         }
         public Rectangle HitBox { get { return new Rectangle((int)Position.X, (int)Position.Y, Texture.Width, Texture.Height); } }
+        //
+        
         public Vector2 Position { get; set; }
         public Color Color { get; set; }
-
         public float Volocity { get; set; }
         public Vector2 Direction { get; set; }
         public Texture2D Texture { get; set; }
