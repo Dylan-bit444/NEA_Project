@@ -25,37 +25,47 @@ namespace NEA_Project
 
         public Vector2 Origin { get { return new Vector2(Texture.Width / 2, Texture.Height / 2); } }
         public bool IsDraw = true;
-
-        public void Update(GraphicsDeviceManager graphics,float time)
+        public void Update(GraphicsDeviceManager graphics, float time)
         {
             Position += Direction * Volocity * time;
-            if (Position.X < Origin.X )
+            if (Position.X < 0)
             {
                 if (Direction.X < 0)
                 {
                     Direction = new(-Direction.X, Direction.Y);
                 }
             }
-            else if(Position.X > graphics.PreferredBackBufferWidth - Origin.X)
+            else if (Texture.Width + Position.X > graphics.PreferredBackBufferWidth)
             {
                 if (Direction.X > 0)
                 {
                     Direction = new(-Direction.X, Direction.Y);
                 }
             }
-            if (Position.Y < Origin.Y)
+            if (Position.Y < 0)
             {
                 if (Direction.Y < 0)
                 {
                     Direction = new(Direction.X, -Direction.Y);
                 }
             }
-            else if (Position.Y > graphics.PreferredBackBufferHeight - Origin.Y)
+            else if (Texture.Height + Position.Y > graphics.PreferredBackBufferHeight)
             {
                 if (Direction.Y > 0)
                 {
                     Direction = new(Direction.X, -Direction.Y);
                 }
+            }
+        }
+        public bool Collided(Rectangle box)
+        {
+            if (HitBox.Intersects(box))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }

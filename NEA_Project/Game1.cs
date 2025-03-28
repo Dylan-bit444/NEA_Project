@@ -12,7 +12,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Sprite[] sprites =new Sprite[200];
+        private Circle[] circles =new Circle[0];
+        private Square[] squares = new Square[4];
 
         public Game1()
         {
@@ -36,9 +37,14 @@ namespace NEA_Project
             Random rnd = new Random();
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Texture2D ball = Content.Load<Texture2D>("Ball");
-            for(int i=0; i<sprites.Length;i++)
+            Texture2D square = Content.Load<Texture2D>("Brick");
+            for(int i=0; i<circles.Length;i++)
             {
-                sprites[i] = new(ball, new Vector2(rnd.Next(ball.Width+5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height+5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 500, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
+                circles[i] = new(ball, new Vector2(rnd.Next(ball.Width+5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height+5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 200, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
+            }
+            for (int i = 0; i < squares.Length; i++)
+            {
+                squares[i] = new(square, new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 400, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
             }
             // TODO: use this.Content to load your game content here
         }
@@ -48,9 +54,13 @@ namespace NEA_Project
             float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            foreach(Sprite s in sprites) 
+            foreach(Circle circle in circles) 
             {
-                s.Update(_graphics,time);
+                circle.Update(_graphics,time);
+            }
+            foreach(Square square in squares)
+            {
+                square.Update(_graphics,time);
             }
             // TODO: Add your update logic here
             CheckCollisions();
@@ -58,13 +68,23 @@ namespace NEA_Project
         }
         private void CheckCollisions()
         {
-            for (int i = 0; i < sprites.Length - 1; i++)
+            for (int i = 0; i < circles.Length - 1; i++)
             {
-                for (int j = i + 1; j < sprites.Length; j++)
+                for (int j = i + 1; j < circles.Length; j++)
                 {
-                    if ((sprites[i].Position - sprites[j].Position).Length() < (sprites[i].Origin.X + sprites[j].Origin.X))
+                    if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Origin.X + circles[j].Origin.X))
                     {
-                        ResolveCollision(sprites[i], sprites[j]);
+                        ResolveCollision(circles[i], circles[j]);
+                    }
+                }
+            }
+            for (int i = 0; i < squares.Length - 1; i++)
+            {
+                for (int j = i + 1; j < squares.Length; j++)
+                {
+                    if (squares[i].Collided(squares[j].HitBox))
+                    {
+                        ResolveCollision(squares[i], squares[j]);
                     }
                 }
             }
@@ -76,7 +96,11 @@ namespace NEA_Project
 
             // TODO: Add your drawing code here
             _spriteBatch.Begin();
-            foreach(Sprite s in sprites)
+            foreach(Sprite s in circles)
+            {
+                _spriteBatch.Draw(s.Texture, s.Position, s.Color);
+            }
+            foreach (Sprite s in squares)
             {
                 _spriteBatch.Draw(s.Texture, s.Position, s.Color);
             }
