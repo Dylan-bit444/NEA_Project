@@ -12,7 +12,7 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[200];
+        private Circle[] circles = new Circle[1];
         private Square[] squares = new Square[100];
 
         public Game1()
