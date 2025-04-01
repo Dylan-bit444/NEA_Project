@@ -2,7 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace NEA_Project
 {
@@ -10,7 +10,7 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[10];
+        private Circle[] circles = new Circle[100];
         private Square[] squares = new Square[100];
 
         public Game1()
@@ -19,8 +19,8 @@ namespace NEA_Project
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
             _graphics.PreferredBackBufferWidth = 1950;
-            _graphics.PreferredBackBufferHeight = 1100;
-            _graphics.IsFullScreen = true;
+            _graphics.PreferredBackBufferHeight = 1000;
+            _graphics.IsFullScreen = false;
         }
 
         protected override void Initialize()
@@ -52,58 +52,58 @@ namespace NEA_Project
             float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            foreach (Circle circle in circles)
+            Parallel.ForEach(circles, circle =>
             {
                 circle.Update(_graphics, time);
-            }
-            foreach (Square square in squares)
+            });
+            Parallel.ForEach(squares, square =>
             {
                 square.Update(_graphics, time);
-            }
+            });
             // TODO: Add your update logic here
             CheckCollisions();
             base.Update(gameTime);
         }
         private void CheckCollisions()
         {
-            for (int i = 0; i < circles.Length - 1; i++)
+            const int RadiusIncrement = 350;
+            Parallel.For(0, circles.Length, i =>
             {
-                for (int j = i + 1; j < circles.Length; j++)
+            for (int j = i + 1; j < squares.Length; j++)
+            {
+                // this is the unit vector or discance is less than the length of both circles raidi 
+                if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Texture.Width / 2 + circles[j].Texture.Width / 2))
                 {
-                    // this is the unit vector or discance is less than the length of both circles raidi 
-                    if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Texture.Width/2 + circles[j].Texture.Width/2))
-                    {
-                        ResolveCollision(circles[i], circles[j]);
-                    }
+                    ResolveCollision(circles[i], circles[j]);
                 }
             }
-            for (int i = 0; i < squares.Length - 1; i++)
+            });
+            Parallel.For(0, squares.Length - 1, i =>
             {
-                for (int j = i + 1; j < squares.Length; j++)
+                for(int j=i + 1; j < squares.Length;j++)
                 {
                     if (squares[i].Collided(squares[j].HitBox))
                     {
                         ResolveCollision(squares[i], squares[j]);
                     }
                 }
-            }
-            foreach (Square square in squares)
+            });
+            Parallel.ForEach(squares, square =>
             {
-                foreach (Circle circle in circles)
+                Parallel.ForEach(circles, circle =>
                 {
-                    for (int i = 0; i < (square.Position-square.Origin).Length()-(square.Texture.Width/2); i+=250)
+                    for (int i = 0; i < (square.Position - square.Origin).Length() - (square.Texture.Width / 2); i += RadiusIncrement)
                     {
-                        if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + (square.Texture.Width+i / 2))&&
-                             circle.Collided(square.HitBox))
+                        if (circle.Collided(square.HitBox))
                         {
-                            ResolveCollision(circle, square);
-                            square.ColliedWithCircle = true;
+                            if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + (square.Texture.Width + i / 2)))
+                            {
+                                ResolveCollision(circle, square);
+                            }
                         }
                     }
-                    square.ColliedWithCircle = false;
-                }
-                Debug.WriteLine((square.Position - square.Origin).Length() - (square.Texture.Width / 2));
-            }
+                });
+            });
         }
 
         protected override void Draw(GameTime gameTime)
