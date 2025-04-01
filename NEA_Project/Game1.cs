@@ -12,8 +12,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[700];
-        private Square[] squares = new Square[0];
+        private Circle[] circles = new Circle[10];
+        private Square[] squares = new Square[100];
 
         public Game1()
         {
@@ -21,7 +21,7 @@ namespace NEA_Project
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
             _graphics.PreferredBackBufferWidth = 1950;
-            _graphics.PreferredBackBufferHeight = 2100;
+            _graphics.PreferredBackBufferHeight = 1100;
             _graphics.IsFullScreen = true;
         }
 
@@ -72,7 +72,8 @@ namespace NEA_Project
             {
                 for (int j = i + 1; j < circles.Length; j++)
                 {
-                    if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Origin.X + circles[j].Origin.X))
+                    // this is the unit vector or discance is less than the length of both circles raidi 
+                    if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Texture.Width/2 + circles[j].Texture.Width/2))
                     {
                         ResolveCollision(circles[i], circles[j]);
                     }
@@ -92,11 +93,18 @@ namespace NEA_Project
             {
                 foreach (Circle circle in circles)
                 {
-                    if (circle.Collided(square.HitBox))
+                    for (int i = 0; i < (square.Position-square.Origin).Length()-(square.Texture.Width/2); i+=250)
                     {
-                        ResolveCollision(circle, square);
+                        if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + (square.Texture.Width+i / 2))&&
+                             circle.Collided(square.HitBox))
+                        {
+                            ResolveCollision(circle, square);
+                            square.ColliedWithCircle = true;
+                        }
                     }
+                    square.ColliedWithCircle = false;
                 }
+                Debug.WriteLine((square.Position - square.Origin).Length() - (square.Texture.Width / 2));
             }
         }
 
