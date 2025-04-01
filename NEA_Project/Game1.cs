@@ -10,8 +10,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[100];
-        private Square[] squares = new Square[100];
+        private Circle[] circles = new Circle[500];
+        private Square[] squares = new Square[0];
 
         public Game1()
         {
@@ -69,7 +69,7 @@ namespace NEA_Project
             const int RadiusIncrement = 350;
             Parallel.For(0, circles.Length, i =>
             {
-            for (int j = i + 1; j < squares.Length; j++)
+            for (int j = i + 1; j < circles.Length; j++)
             {
                 // this is the unit vector or discance is less than the length of both circles raidi 
                 if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Texture.Width / 2 + circles[j].Texture.Width / 2))
