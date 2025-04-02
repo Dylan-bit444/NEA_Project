@@ -11,8 +11,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[300];
-        private Square[] squares = new Square[300];
+        private Circle[] circles = new Circle[20];
+        private Square[] squares = new Square[20];
         private QuadTree _quadtree;
 
         public Game1()
@@ -27,6 +27,7 @@ namespace NEA_Project
 
         protected override void Initialize()
         {
+            // Initialize the quadtree with level 0 and the bounds of the screen
             _quadtree = new QuadTree(0, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight));
             base.Initialize();
         }
@@ -37,13 +38,31 @@ namespace NEA_Project
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             Texture2D ball = Content.Load<Texture2D>("Ball");
             Texture2D square = Content.Load<Texture2D>("Brick");
+
+            // Initialize circles with random positions and directions
             for (int i = 0; i < circles.Length; i++)
             {
-                circles[i] = new(ball, new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 200, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
+                circles[i] = new Circle(
+                    ball,
+                    new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)),
+                                rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))),
+                    Color.White,
+                    200,
+                    new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI))
+                );
             }
+
+            // Initialize squares with random positions and directions
             for (int i = 0; i < squares.Length; i++)
             {
-                squares[i] = new(square, new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 200, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
+                squares[i] = new Square(
+                    square,
+                    new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)),
+                                rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))),
+                    Color.White,
+                    200,
+                    new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI))
+                );
             }
         }
 
@@ -52,25 +71,36 @@ namespace NEA_Project
             float time = (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
+            // Update positions of all circles
             foreach (Circle circle in circles)
             {
                 circle.Update(_graphics, time);
             }
+
+            // Update positions of all squares
             foreach (Square square in squares)
             {
                 square.Update(_graphics, time);
             }
+
+            // Check for collisions between objects
             CheckCollisions();
             base.Update(gameTime);
         }
 
         private void CheckCollisions()
         {
+            // Clear the quadtree to prepare for new frame
             _quadtree.Clear();
+
+            // Insert all circles into the quadtree
             foreach (var circle in circles)
             {
                 _quadtree.Insert(circle);
             }
+
+            // Insert all squares into the quadtree
             foreach (var square in squares)
             {
                 _quadtree.Insert(square);
@@ -78,6 +108,7 @@ namespace NEA_Project
 
             List<Sprite> possibleCollisions = new List<Sprite>();
 
+            // Check for collisions between circles
             foreach (var circle in circles)
             {
                 possibleCollisions.Clear();
@@ -91,6 +122,7 @@ namespace NEA_Project
                 }
             }
 
+            // Check for collisions between squares
             foreach (var square in squares)
             {
                 possibleCollisions.Clear();
@@ -104,6 +136,7 @@ namespace NEA_Project
                 }
             }
 
+            // Check for collisions between squares and circles
             foreach (var square in squares)
             {
                 foreach (var circle in circles)
@@ -126,10 +159,12 @@ namespace NEA_Project
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             _spriteBatch.Begin();
+            // Draw all circles
             foreach (Sprite s in circles)
             {
                 _spriteBatch.Draw(s.Texture, s.Position, s.Color);
             }
+            // Draw all squares
             foreach (Sprite s in squares)
             {
                 _spriteBatch.Draw(s.Texture, s.Position, s.Color);
@@ -138,6 +173,7 @@ namespace NEA_Project
             base.Draw(gameTime);
         }
 
+        // Resolve collision by adjusting the direction of the sprites
         private void ResolveCollision(Sprite b1, Sprite b2)
         {
             var dir = Vector2.Normalize(b1.Position - b2.Position);
