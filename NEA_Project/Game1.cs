@@ -12,8 +12,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[1150];
-        private Square[] squares = new Square[1150];
+        private Circle[] circles = new Circle[1000];
+        private Square[] squares = new Square[1000];
         private QuadTree _quadtree;
 
         public Game1()
@@ -21,8 +21,8 @@ namespace NEA_Project
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            _graphics.PreferredBackBufferWidth = 1150;
-            _graphics.PreferredBackBufferHeight = 1100;
+            _graphics.PreferredBackBufferWidth = 1550;
+            _graphics.PreferredBackBufferHeight = 1000;
             _graphics.IsFullScreen = false;
         }
 

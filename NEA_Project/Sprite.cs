@@ -27,33 +27,21 @@ namespace NEA_Project
         public void Update(GraphicsDeviceManager graphics, float time)
         {
             Position += Direction * Volocity * time;
-            if (Position.X < 0)
+            if (Position.X < 0 && Direction.X < 0)
             {
-                if (Direction.X < 0)
-                {
-                    Direction = new(-Direction.X, Direction.Y);
-                }
+                Direction = new(-Direction.X, Direction.Y);
             }
-            else if (Texture.Width + Position.X > graphics.PreferredBackBufferWidth)
+            else if (Direction.X > 0 && Texture.Width + Position.X > graphics.PreferredBackBufferWidth)
             {
-                if (Direction.X > 0)
-                {
-                    Direction = new(-Direction.X, Direction.Y);
-                }
+                Direction = new(-Direction.X, Direction.Y);
             }
-            if (Position.Y < 0)
-            {
-                if (Direction.Y < 0)
-                {
-                    Direction = new(Direction.X, -Direction.Y);
-                }
+            if (Direction.Y < 0 && Position.Y < 0 )
+            { 
+                Direction = new(Direction.X, -Direction.Y);
             }
-            else if (Texture.Height + Position.Y > graphics.PreferredBackBufferHeight)
+            else if (Direction.Y > 0 && Texture.Height + Position.Y > graphics.PreferredBackBufferHeight)
             {
-                if (Direction.Y > 0)
-                {
-                    Direction = new(Direction.X, -Direction.Y);
-                }
+                Direction = new(Direction.X, -Direction.Y);
             }
         }
         public bool Collided(Rectangle box)
