@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 
 namespace NEA_Project
 {
-    internal class Sprite
+    public class Sprite
     {
         public Sprite(Texture2D Texture, Vector2 Position, Color Color,float Volocity, Vector2 Direction )
         {

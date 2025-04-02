@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace NEA_Project
 {
@@ -10,8 +11,9 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[10];
-        private Square[] squares = new Square[100];
+        private Circle[] circles = new Circle[300];
+        private Square[] squares = new Square[300];
+        private QuadTree _quadtree;
 
         public Game1()
         {
@@ -25,8 +27,7 @@ namespace NEA_Project
 
         protected override void Initialize()
         {
-            // TODO: Add your initialization logic here
-
+            _quadtree = new QuadTree(0, new Rectangle(0, 0, _graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight));
             base.Initialize();
         }
 
@@ -44,7 +45,6 @@ namespace NEA_Project
             {
                 squares[i] = new(square, new Vector2(rnd.Next(ball.Width + 5, _graphics.PreferredBackBufferWidth - (ball.Width + 5)), rnd.Next(ball.Height + 5, _graphics.PreferredBackBufferHeight - (ball.Height + 5))), Color.White, 200, new Vector2((float)Math.Sin(rnd.NextDouble() * 2 * Math.PI), -(float)Math.Cos(rnd.NextDouble() * 2 * Math.PI)));
             }
-            // TODO: use this.Content to load your game content here
         }
 
         protected override void Update(GameTime gameTime)
@@ -60,49 +60,64 @@ namespace NEA_Project
             {
                 square.Update(_graphics, time);
             }
-            // TODO: Add your update logic here
             CheckCollisions();
             base.Update(gameTime);
         }
+
         private void CheckCollisions()
         {
-            for (int i = 0; i < circles.Length - 1; i++)
+            _quadtree.Clear();
+            foreach (var circle in circles)
             {
-                for (int j = i + 1; j < circles.Length; j++)
+                _quadtree.Insert(circle);
+            }
+            foreach (var square in squares)
+            {
+                _quadtree.Insert(square);
+            }
+
+            List<Sprite> possibleCollisions = new List<Sprite>();
+
+            foreach (var circle in circles)
+            {
+                possibleCollisions.Clear();
+                _quadtree.Retrieve(possibleCollisions, circle);
+                foreach (var other in possibleCollisions)
                 {
-                    // this is the unit vector or discance is less than the length of both circles raidi 
-                    if ((circles[i].Position - circles[j].Position).Length() < (circles[i].Texture.Width/2 + circles[j].Texture.Width/2))
+                    if (circle != other && (circle.Position - other.Position).Length() < (circle.Texture.Width / 2 + other.Texture.Width / 2))
                     {
-                        ResolveCollision(circles[i], circles[j]);
+                        ResolveCollision(circle, other);
                     }
                 }
             }
-            for (int i = 0; i < squares.Length - 1; i++)
+
+            foreach (var square in squares)
             {
-                for (int j = i + 1; j < squares.Length; j++)
+                possibleCollisions.Clear();
+                _quadtree.Retrieve(possibleCollisions, square);
+                foreach (var other in possibleCollisions)
                 {
-                    if (squares[i].Collided(squares[j].HitBox))
+                    if (square != other && square.Collided(other.HitBox))
                     {
-                        ResolveCollision(squares[i], squares[j]);
+                        ResolveCollision(square, other);
                     }
                 }
             }
-            foreach (Square square in squares)
+
+            foreach (var square in squares)
             {
-                foreach (Circle circle in circles)
+                foreach (var circle in circles)
                 {
-                    for (int i = 0; i < (square.Position-square.Origin).Length()-(square.Texture.Width/2); i+=250)
+                    if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + square.Texture.Width / 2) && circle.Collided(square.HitBox))
                     {
-                        if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + (square.Texture.Width+i / 2))&&
-                             circle.Collided(square.HitBox))
-                        {
-                            ResolveCollision(circle, square);
-                            square.ColliedWithCircle = true;
-                        }
+                        ResolveCollision(circle, square);
+                        square.ColliedWithCircle = true;
                     }
-                    square.ColliedWithCircle = false;
+                    else
+                    {
+                        square.ColliedWithCircle = false;
+                    }
                 }
-                Debug.WriteLine((square.Position - square.Origin).Length() - (square.Texture.Width / 2));
             }
         }
 
@@ -110,7 +125,6 @@ namespace NEA_Project
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
             _spriteBatch.Begin();
             foreach (Sprite s in circles)
             {
