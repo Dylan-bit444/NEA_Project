@@ -9,7 +9,7 @@ namespace NEA_Project
     {
         // Maximum number of objects a node can hold before it splits into subnodes
         // Helps to limit the number of objects in a single node, improving search efficiency
-        private const int MAX_OBJECTS = 50;
+        private const int MAX_OBJECTS = 100;
         // Maximum levels of the quadtree to prevent infinite splitting
         // Ensures the tree does not grow too deep, which could degrade performance
         private const int MAX_LEVELS = 10;

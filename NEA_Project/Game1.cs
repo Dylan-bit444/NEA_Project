@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Diagnostics;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace NEA_Project
 {
@@ -11,8 +12,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[20];
-        private Square[] squares = new Square[20];
+        private Circle[] circles = new Circle[1150];
+        private Square[] squares = new Square[1150];
         private QuadTree _quadtree;
 
         public Game1()
@@ -20,9 +21,9 @@ namespace NEA_Project
             _graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            _graphics.PreferredBackBufferWidth = 1950;
+            _graphics.PreferredBackBufferWidth = 1150;
             _graphics.PreferredBackBufferHeight = 1100;
-            _graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = false;
         }
 
         protected override void Initialize()
@@ -95,13 +96,13 @@ namespace NEA_Project
             _quadtree.Clear();
 
             // Insert all circles into the quadtree
-            foreach (var circle in circles)
+            foreach (Circle circle in circles)
             {
                 _quadtree.Insert(circle);
             }
 
             // Insert all squares into the quadtree
-            foreach (var square in squares)
+            foreach (Square square in squares)
             {
                 _quadtree.Insert(square);
             }
@@ -109,11 +110,11 @@ namespace NEA_Project
             List<Sprite> possibleCollisions = new List<Sprite>();
 
             // Check for collisions between circles
-            foreach (var circle in circles)
+            foreach (Circle circle in circles)
             {
                 possibleCollisions.Clear();
                 _quadtree.Retrieve(possibleCollisions, circle);
-                foreach (var other in possibleCollisions)
+                foreach (Sprite other in possibleCollisions)
                 {
                     if (circle != other && (circle.Position - other.Position).Length() < (circle.Texture.Width / 2 + other.Texture.Width / 2))
                     {
@@ -123,11 +124,11 @@ namespace NEA_Project
             }
 
             // Check for collisions between squares
-            foreach (var square in squares)
+            foreach (Square square in squares)
             {
                 possibleCollisions.Clear();
                 _quadtree.Retrieve(possibleCollisions, square);
-                foreach (var other in possibleCollisions)
+                foreach (Sprite other in possibleCollisions)
                 {
                     if (square != other && square.Collided(other.HitBox))
                     {
@@ -137,21 +138,16 @@ namespace NEA_Project
             }
 
             // Check for collisions between squares and circles
-            foreach (var square in squares)
+            Parallel.ForEach(squares, square =>
             {
-                foreach (var circle in circles)
+                foreach(Circle circle in circles)
                 {
                     if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + square.Texture.Width / 2) && circle.Collided(square.HitBox))
                     {
                         ResolveCollision(circle, square);
-                        square.ColliedWithCircle = true;
-                    }
-                    else
-                    {
-                        square.ColliedWithCircle = false;
                     }
                 }
-            }
+            });
         }
 
         protected override void Draw(GameTime gameTime)
