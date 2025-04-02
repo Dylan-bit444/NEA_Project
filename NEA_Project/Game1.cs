@@ -10,8 +10,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[1999];
-        private Square[] squares = new Square[1];
+        private Circle[] circles = new Circle[99];
+        private Square[] squares = new Square[99];
 
         public Game1()
         {
@@ -92,11 +92,11 @@ namespace NEA_Project
             {
                 Parallel.ForEach(circles, circle =>
                 {
-                    for (int i = 0; i < (square.Position - square.Origin).Length() - (square.Texture.Width / 2); i += RadiusIncrement)
+                    if (circle.Collided(square.HitBox))
                     {
-                        if (circle.Collided(square.HitBox))
-                        {
-                            if ((circle.Position - square.Position).Length() < (circle.Texture.Width / 2 + (square.Texture.Width + i / 2)))
+                        for (int i = 0; i < (square.Position - square.Origin).Length() - (square.Texture.Width / 2); i += RadiusIncrement)
+                    {
+                            if ((circle.Origin - square.Origin).Length() < (circle.Texture.Width / 2 + (square.Texture.Width + i / 2)))
                             {
                                 ResolveCollision(circle, square);
                             }
