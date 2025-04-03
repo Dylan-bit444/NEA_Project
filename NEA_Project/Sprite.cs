@@ -20,7 +20,6 @@ namespace NEA_Project
         public float Volocity { get; set; }
         public Vector2 Direction { get; set; }
         public Texture2D Texture { get; set; }
-        public Rectangle BoundingBox { get; set; }
 
         public Vector2 Origin { get { return new Vector2(Texture.Width / 2, Texture.Height / 2); } }
         public bool IsDraw = true;
@@ -54,6 +53,37 @@ namespace NEA_Project
             {
                 return false;
             }
+        }
+        public bool TouchingLeft(Sprite sprite)
+        {
+            return this.HitBox.Right + this.Position.X > sprite.HitBox.Left &&
+              this.HitBox.Left < sprite.HitBox.Left &&
+              this.HitBox.Bottom > sprite.HitBox.Top &&
+              this.HitBox.Top < sprite.HitBox.Bottom;
+        }
+
+        public bool TouchingRight(Sprite sprite)
+        {
+            return this.HitBox.Left + this.Position.X < sprite.HitBox.Right &&
+              this.HitBox.Right > sprite.HitBox.Right &&
+              this.HitBox.Bottom > sprite.HitBox.Top &&
+              this.HitBox.Top < sprite.HitBox.Bottom;
+        }
+
+        public bool TouchingTop(Sprite sprite)
+        {
+            return this.HitBox.Bottom + this.Position.Y > sprite.HitBox.Top &&
+              this.HitBox.Top < sprite.HitBox.Top &&
+              this.HitBox.Right > sprite.HitBox.Left &&
+              this.HitBox.Left < sprite.HitBox.Right;
+        }
+
+        public bool TouchingBottom(Sprite sprite)
+        {
+            return this.HitBox.Top + this.Position.Y < sprite.HitBox.Bottom &&
+              this.HitBox.Bottom > sprite.HitBox.Bottom &&
+              this.HitBox.Right > sprite.HitBox.Left &&
+              this.HitBox.Left < sprite.HitBox.Right;
         }
     }
 }
