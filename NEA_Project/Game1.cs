@@ -13,8 +13,8 @@ namespace NEA_Project
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-        private Circle[] circles = new Circle[1000];
-        private Square[] squares = new Square[1];
+        private Circle[] circles = new Circle[0];
+        private Square[] squares = new Square[100];
         private QuadTree _quadtree;
 
         public Game1()
@@ -119,7 +119,8 @@ namespace NEA_Project
                 {
                     if (circle != other && (circle.Position - other.Position).Length() < (circle.Texture.Width / 2 + other.Texture.Width / 2))
                     {
-                        ResolveCollision(circle, other);
+                        circle.Direction = Vector2.Normalize(circle.Position - other.Position);
+                        other.Direction = -Vector2.Normalize(circle.Position - other.Position);
                     }
                 }
             }
@@ -133,17 +134,42 @@ namespace NEA_Project
                 {
                     if (square != other && square.Collided(other.HitBox))
                     {
-                        if ((other.TouchingRight(square) && other.Direction.X > 0) || (other.TouchingLeft(square) && other.Direction.X < 0))
+                        if (square.TouchingRight(other) || square.TouchingLeft(other))
                         {
-                            square.Direction *= new Vector2(1, -1);
-                            other.Direction *= new Vector2(1, -1);
-                        }
-                        if ((other.TouchingTop(square) && other.Direction.Y > 0) || (other.TouchingBottom(square) && other.Direction.Y < 0))
-                        {
+                            if (square.Direction.X * other.Direction.X < 0)
+                            {
+                                other.Direction *= new Vector2(-1, 1);
+                            }
+                            else if (other.Direction.X >= 0)
+                            {
+                                other.Direction += new Vector2(square.Direction.X / 1.1f, 0);
+                                square.Direction -= new Vector2(square.Direction.X / 1.1f, 0);
+                            }
+                            else if(other.Direction.X <= 0)
+                            {
+                                other.Direction -= new Vector2(other.Direction.X / 1.1f, 0);
+                                square.Direction -= new Vector2(square.Direction.X / 1.1f, 0);
+                            }
                             square.Direction *= new Vector2(-1, 1);
-                            other.Direction *= new Vector2(-1, 1);
                         }
-                        ResolveCollision(square, other);
+                        if (square.TouchingTop(other) || square.TouchingBottom(other))
+                        {
+                            if (square.Direction.Y * other.Direction.Y < 0)
+                            {
+                                other.Direction *= new Vector2(1, -1);
+                            }
+                            else if (other.Direction.Y >= 0)
+                            {
+                                other.Direction += new Vector2(0,square.Direction.Y / 1.1f);
+                                square.Direction -= new Vector2(0, square.Direction.Y / 1.1f);
+                            }
+                            else if (other.Direction.Y <= 0)
+                            {
+                                other.Direction -= new Vector2(0, square.Direction.Y / 1.1f);
+                                square.Direction -= new Vector2(0, square.Direction.Y / 1.1f);
+                            }
+                            square.Direction *= new Vector2(-1, 1);
+                        }
                     }
                 }
             }
@@ -153,19 +179,18 @@ namespace NEA_Project
             {
                 foreach(Circle circle in circles)
                 {
-                    if (circle.Collided(square.HitBox)&&(circle.Origin - square.Origin).Length() < ((circle.Texture.Width / 2 )+ (square.Texture.Width/2)))
+                    if (circle.Collided(square.HitBox)&&(circle.Origin - square.Origin).Length() < ((circle.Texture.Width / 2 )+ (square.Origin - square.Position).Length()))
                     {
-                        //if((circle.TouchingRight(square) && circle.Direction.X > 0) || (circle.TouchingLeft(square)&& circle.Direction.X < 0))
-                        //{
-                        //    square.Direction *= new Vector2(1, -1);
-                        //    circle.Direction *= new Vector2(1, -1);
-                        //}
-                        //if((circle.TouchingTop(square) && circle.Direction.Y > 0) || (circle.TouchingBottom(square) && circle.Direction.Y < 0))
-                        //{
-                        //    square.Direction *= new Vector2(-1, 1);
-                        //    circle.Direction *= new Vector2(-1, 1);
-                        //}
-                        ResolveCollision(square, circle);
+                        if ((circle.TouchingRight(square) && circle.Direction.X <= 0) || (circle.TouchingLeft(square) && circle.Direction.X >= 0))
+                        {
+                            square.Direction *= new Vector2(-1, 1);
+                            circle.Direction *= new Vector2(-1, 1);
+                        }
+                        if ((circle.TouchingTop(square) && circle.Direction.Y <= 0) || (circle.TouchingBottom(square) && circle.Direction.Y >= 0))
+                        {
+                            square.Direction *= new Vector2(1, -1);
+                            circle.Direction *= new Vector2(1, -1);
+                        }
                     }
                 }
             });
@@ -188,14 +213,6 @@ namespace NEA_Project
             }
             _spriteBatch.End();
             base.Draw(gameTime);
-        }
-
-        // Resolve collision by adjusting the direction of the sprites
-        private void ResolveCollision(Sprite b1, Sprite b2)
-        {
-            var dir = Vector2.Normalize(b1.Position - b2.Position);
-            b1.Direction = dir;
-            b2.Direction = -dir;
         }
     }
 }

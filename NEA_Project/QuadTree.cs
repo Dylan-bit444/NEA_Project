@@ -12,7 +12,7 @@ namespace NEA_Project
         private const int MAX_OBJECTS = 100;
         // Maximum levels of the quadtree to prevent infinite splitting
         // Ensures the tree does not grow too deep, which could degrade performance
-        private const int MAX_LEVELS = 10;
+        private const int MAX_LEVELS = 5;
 
         // Current level of this node in the quadtree
         // Helps to track the depth of the node, which is used to control splitting
